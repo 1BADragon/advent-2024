@@ -1,4 +1,5 @@
 import sys
+import functools
 
 
 def get_stones():
@@ -18,25 +19,29 @@ def transform_stone(stone: int) -> list[int]:
     return [stone * 2024]
 
 
-def blink(stones: list[int]) -> list[int]:
-    ret = []
+@functools.lru_cache(100000)
+def blink(stone: int, remaining: int) -> int:
+    if remaining == 0:
+        return 0
 
-    for stone in stones:
-        ret.extend(transform_stone(stone))
+    t = transform_stone(stone)
+    sum = 0
+    if remaining == 1:
+        sum = len(t)
+    for s in t:
+        sum += blink(s, remaining - 1)
 
-    return ret
+    return sum
 
 
 def main():
     stones = get_stones()
 
-    for i in range(75):
-        print(f"\r{i} -- {len(stones)}", end="")
-        stones = blink(stones)
+    sum = 0
+    for stone in stones:
+        sum += blink(stone, 75)
 
-    print()
-
-    print(len(stones))
+    print(sum)
 
 
 main()
