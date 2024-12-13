@@ -1,11 +1,7 @@
 import sys
 
-directions = [
-    (0, 1),
-    (1, 0),
-    (0, -1),
-    (-1, 0)
-]
+directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+
 
 def read_map() -> list[list[int]]:
     map: list[list[int]] = []
@@ -16,12 +12,8 @@ def read_map() -> list[list[int]]:
 
     return map
 
-# scores: dict[tuple[int, int], int] = {}
-def score_at(map: list[list[int]], x: int, y: int, nines: set[tuple[int, int]]) -> int:
-    # if (x, y) in scores:
-    #     return 0
-        # return scores[(x, y)]
 
+def score_at(map: list[list[int]], x: int, y: int, current: tuple, trails: set) -> int:
     if y < 0 or y >= len(map):
         return 0
 
@@ -29,11 +21,11 @@ def score_at(map: list[list[int]], x: int, y: int, nines: set[tuple[int, int]]) 
         return 0
 
     curr = map[y][x]
-    print(x, y, curr)
+    path = (*current, (x, y))
     if curr == 9:
-        if (x, y) in nines:
+        if path in trails:
             return 0
-        nines.add((x, y))
+        trails.add(path)
         return 1
 
     score = 0
@@ -44,11 +36,10 @@ def score_at(map: list[list[int]], x: int, y: int, nines: set[tuple[int, int]]) 
             continue
         next = map[y2][x2]
         if next == curr + 1:
-            score += score_at(map, x2, y2, nines)
+            score += score_at(map, x2, y2, path, trails)
 
-    # scores[(x, y)] = score
     return score
-    
+
 
 def main():
     map = read_map()
@@ -58,8 +49,9 @@ def main():
     for y in range(len(map)):
         for x in range(len(map[y])):
             if map[y][x] == 0:
-                map_score += score_at(map, x, y, set())
+                map_score += score_at(map, x, y, (), set())
 
     print(map_score)
+
 
 main()
